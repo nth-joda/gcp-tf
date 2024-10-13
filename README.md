@@ -289,3 +289,17 @@ resource "google_compute_instance" "vm_instance" {
 project                  = "<PROJECT_ID>"
 credentials_file         = "<FILE>"
 ```
+
+### 1.5 Output
+
+- Ví dụ dựng xong system gòy thì mình làm gì nữa? Có phải là lên GCloud Console check coi con server đang chạy ở ip nào, port nào, gòy vô DNS map với domain name đúng hông? Nếu bước này mình tự động hoá luôn thì làm sao để lấy IP server sau khi infrastructure dựng xong? --> file `output.tf`
+
+- File `output.tf` cho phép mình định nghĩa và lấy về các giá trị sau khi `terraform aplly`. Ví dụ tạo file `output.tf` lấy về ip:
+
+```tf
+output "ip" {
+  value = google_compute_instance.vm_instance.network_interface.0.network_ip
+}
+```
+
+- gòy khúc này nếu mình chạy xong `terraform apply`, chạy `terraform output`, mình sẽ thấy: `ip = "10.128.0.3"`
