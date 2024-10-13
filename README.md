@@ -241,7 +241,51 @@ với mục 1.3 là xài ngon lành cành sữa đậu nành gòy, giờ là th�
 - Định nghĩa thử các biến:
 
 ```sh
+variable "project" {}
+
+variable "credentials_file" {}
+
+variable "region" {
+  default = "us-central1"
+}
+
+## ======= GC
+variable "zone" { # biến vùng của các GC
+  default = "us-central1-c"
+}
+variable "toot_image" { # biến boot_image
+  default = "debian-cloud/debian-11"
+}
+variable "machine_type" { # biến độ mạnh của máy
+  default = "f1-micro"
+}
 
 ```
 
-Để sử dụng các biến
+Để sử dụng các biến đã tạo: `var.<tên_biến>`, ví dụ `var.machine_type` sẽ trả về "f1-micro"
+
+Đổi các giá trị property của GC trong file `main.tf` bằng các biến, gòy apply thử (nhớ gắn lại 'Billing' và enable lại 'Compute Engine API' nếu hồi nãy gỡ gòy):
+
+```tf
+resource "google_compute_instance" "vm_instance" {
+  name         = "terraform-instance" # tên của component
+  machine_type = var.machine_type     # property của GC, độ mạnh của máy ảo
+  zone         = var.zone             # khu vực của máy
+  tags         = ["web", "dev"]
+  boot_disk { # định nghĩa cấu hình của máy: OS, size ..., ví dụ con này chạy linux debian
+    initialize_params {
+      image = var.boot_image
+    }
+  }
+```
+
+- Nó hay ha, mình no chỉ định đường dẫn đến file variables mà nó tự biết luôn. Cơ chế là nó sẽ load tất cả files đuôi tf trong folder project. keyword `variable` nó sẽ processed trước, r mới tới các keywork khác, như resource. Tức là chổ này mình có thể chia ra nhiều file variable để quản lý.
+
+- Nưu Ý: Các biến nhạy cảm như: ProjectID, credentials, ... nên lưu ở 1 file riêng và ko Version Control các file này (coi chừng như vụ FSoft).
+
+- Nó có offer cho mình 1 file tên là `terraform.tfvars` hoặc các file tên gì cũng đc, miễn đuôi `.auto.tfvars` để mình định nghãi các biến theo kiểu:
+
+```tfvars
+project                  = "<PROJECT_ID>"
+credentials_file         = "<FILE>"
+```

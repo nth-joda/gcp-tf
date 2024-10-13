@@ -25,12 +25,12 @@ resource "google_compute_network" "vpc_network" {
 # Định nghĩa chi tiết các property của block GC mình coi ở đây he: https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance?product_intent=terraform
 resource "google_compute_instance" "vm_instance" {
   name         = "terraform-instance" # tên của component
-  machine_type = "f1-micro"           # property của GC, độ mạnh của máy ảo
-  zone         = "us-central1-a"      # khu vực của máy
+  machine_type = var.machine_type     # property của GC, độ mạnh của máy ảo
+  zone         = var.zone             # khu vực của máy
   tags         = ["web", "dev"]
   boot_disk { # định nghĩa cấu hình của máy: OS, size ..., ví dụ con này chạy linux debian
     initialize_params {
-      image = "debian-cloud/debian-11"
+      image = var.boot_image
     }
   }
 
